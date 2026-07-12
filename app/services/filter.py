@@ -69,22 +69,10 @@ def apply_filters(
     )
 
     if not candidates:
-        # Build suggestions: available cities + locations
-        available_cities = sorted({r.city for r in restaurants})
-        popular_cuisines = _popular_cuisines(restaurants, limit=10)
-        logger.warning(
-            "Location %r not found in dataset. Available cities: %s",
-            prefs.location,
-            ", ".join(available_cities[:10]),
-        )
-        return FilterResult(
-            [],
-            ["Location not found in dataset"],
-            suggestions={
-                "available_cities": available_cities,
-                "popular_cuisines": popular_cuisines,
-            },
-        )
+        # Fallback to entire dataset if location is not found
+        logger.warning("Location %r not found. Relaxing location constraint.", prefs.location)
+        relaxations.append(f"No restaurants found in '{prefs.location}'. Showing popular spots instead.")
+        candidates = restaurants.copy()
 
     # ── 2. Rating filter ────────────────────────────────────────────────
     def filter_by_rating(cands: list[Restaurant], min_r: float) -> list[Restaurant]:
@@ -107,21 +95,14 @@ def apply_filters(
         ]
 
     # ── Apply all filters ───────────────────────────────────────────────
-    # Budget is a HARD constraint. Apply it immediately to location candidates.
+    # Budget was previously a hard constraint, but we relax it if it yields 0 results.
     loc_budget_candidates = filter_by_budget(candidates, prefs.budget)
     logger.info("After budget filter (%s): %d candidates", prefs.budget, len(loc_budget_candidates))
 
     if not loc_budget_candidates:
-        available_cities = sorted({r.city for r in restaurants})
-        popular_cuisines = _popular_cuisines(restaurants, limit=10)
-        return FilterResult(
-            [],
-            [f"No restaurants found in {prefs.location} for the '{prefs.budget}' budget tier."],
-            suggestions={
-                "available_cities": available_cities,
-                "popular_cuisines": popular_cuisines,
-            },
-        )
+        logger.warning("Budget %r yielded 0 results. Relaxing budget constraint.", prefs.budget)
+        relaxations.append(f"No restaurants found in the '{prefs.budget}' budget tier. Budget constraint relaxed.")
+        loc_budget_candidates = candidates.copy()
 
     # Now apply relaxable constraints (rating and cuisine)
     c_rated = filter_by_rating(loc_budget_candidates, prefs.min_rating)
