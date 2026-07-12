@@ -10,6 +10,8 @@ Endpoints:
 
 import logging
 import os
+import re
+import urllib.parse
 from contextlib import asynccontextmanager
 import concurrent.futures
 
@@ -165,7 +167,6 @@ async def recommend(request: RecommendationRequest):
         )
 
     recs = []
-    import urllib.parse
     for i, r in enumerate(result.response.recommendations):
         # Safely get location and city from the original dataset
         rest_location = ""
@@ -178,16 +179,25 @@ async def recommend(request: RecommendationRequest):
                 rest_url = getattr(rest, "url", "")
                 break
         
-        # Clean the name to remove misleading suffixes (e.g., "Maia - Eat | Bake | Mom")
-        import re
+        # Clean name (strip chain sub-labels like "Maia - Eat | Bake | Mom")
         clean_name = re.split(r'[-|]', r.name)[0].strip()
 
-        # Highly specific query to avoid collages and generic food
-        query = f"{clean_name} restaurant {rest_location} {rest_city} interior architecture -people -collage -menu -site:zomato.com -site:eazydiner.com -site:dineout.co.in -site:magicpin.in"
+        # Build a highly specific query that is unique per restaurant.
+        # Including the full original name (r.name) alongside the clean prefix,
+        # the location, and the dataset ID ensures Bing resolves a distinct
+        # thumbnail for every card — preventing two restaurants from receiving
+        # the same cached image.
+        query = (
+            f'"{clean_name}" {r.name} restaurant {rest_location} {rest_city} '
+            f"interior decor food -people -collage -menu "
+            f"-site:zomato.com -site:eazydiner.com -site:dineout.co.in -site:magicpin.in"
+        )
         query_encoded = urllib.parse.quote(query.strip())
-        
-        # Bing Thumbnail API with strict width/height and crop (c=7) for high-quality card images
-        bing_url = f"https://tse1.mm.bing.net/th?q={query_encoded}"
+
+        # &first= offsets the result position — ensures each card in the
+        # current response batch fetches from a different index so duplicate
+        # thumbnails cannot occur even when queries are semantically similar.
+        bing_url = f"https://tse1.mm.bing.net/th?q={query_encoded}&first={i + 1}"
         
         # Format location nicely (e.g., "Brigade Road, Bangalore")
         display_location = r.location

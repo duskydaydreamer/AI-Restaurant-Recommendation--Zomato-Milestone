@@ -313,6 +313,8 @@ def _deduplicate(restaurants: list[Restaurant]) -> list[Restaurant]:
         existing = best.get(key_str)
         if existing is None or r.votes > existing.votes:
             best[key_str] = r
+        elif r.votes == existing.votes and r.cost_for_two > existing.cost_for_two:
+            best[key_str] = r
 
     deduped = list(best.values())
     removed = len(restaurants) - len(deduped)
