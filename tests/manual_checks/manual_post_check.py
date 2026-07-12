@@ -1,3 +1,13 @@
+"""
+Manual smoke check — POST /api/recommendations
+================================================
+This is NOT a pytest test. Run it directly:
+
+    python tests/manual_checks/manual_post_check.py
+
+Requires the dataset to be loaded (PARQUET_PATH env var must be set).
+"""
+
 from fastapi.testclient import TestClient
 from app.api import app
 

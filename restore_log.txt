@@ -1,3 +1,0 @@
-Found massive prompt: True
-App.jsx captured: False
-Card captured: False
