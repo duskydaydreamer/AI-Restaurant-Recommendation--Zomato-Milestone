@@ -34,7 +34,7 @@
 ### 1. Clone & enter the project
 
 ```bash
-git clone <your-repo-url>
+git clone https://github.com/duskydaydreamer/AI-Restaurant-Recommendation--Zomato-Milestone.git
 cd restaurant-recommender
 ```
 
