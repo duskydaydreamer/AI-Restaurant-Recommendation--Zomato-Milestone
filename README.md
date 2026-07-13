@@ -9,6 +9,15 @@
 - **Modern Dashboard** — a responsive React + Vite frontend with search, filters, and rich restaurant cards
 - **Fast API Backend** — a FastAPI server that handles filtering, LLM orchestration, and serves the frontend
 
+## Documentation
+
+- [docs/problemStatement.txt](docs/problemStatement.txt) — basic problem statement
+- [docs/context.md](docs/context.md) — product context
+- [docs/architecture.md](docs/architecture.md) — technical architecture
+- [docs/implementation-plan.md](docs/implementation-plan.md) — phase-wise build plan
+- [docs/edge-cases.md](docs/edge-cases.md) — edge cases and corner scenarios
+- [docs/deployment-plan.md](docs/deployment-plan.md) — future deployment plan
+
 ---
 
 ## Tech Stack

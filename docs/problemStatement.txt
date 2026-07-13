@@ -1,0 +1,7 @@
+Project: DineWise
+
+Problem Statement:
+Users often struggle to find restaurants that perfectly match their specific needs—considering location, budget, preferred cuisine or vibe, and quality. Existing platforms provide overwhelming lists of places with generic filters, leaving users to manually read through countless reviews and menus to make a decision.
+
+Solution:
+DineWise solves this by combining structured filtering with AI-powered reasoning. It first narrows down a comprehensive restaurant dataset using hard constraints (like location and budget). Then, it leverages a Large Language Model (Groq LLaMA) to evaluate the top candidates against the user's nuanced preferences, providing personalized recommendations with clear, human-like explanations for why each restaurant is a great fit.
